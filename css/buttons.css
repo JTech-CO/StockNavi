@@ -1,0 +1,14 @@
+/* ===== Buttons ===== */
+.btn-refresh {
+    background: #f0f0f0;
+    border: 1px solid #999;
+    padding: 2px 6px;
+    font-size: 11px;
+    cursor: pointer;
+    color: #333;
+}
+
+.btn-refresh:active {
+    background: #ddd;
+    transform: translateY(1px);
+}

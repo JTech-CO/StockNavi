@@ -1,0 +1,40 @@
+/* ===== HTS Panel ===== */
+.hts-panel {
+    background: white;
+    border: 1px solid #777;
+    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+.hts-header {
+    background: linear-gradient(to bottom, #2c3e50, #1a252f);
+    color: white;
+    padding: 4px 8px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #bdc3c7;
+    font-size: 12px;
+}
+
+.hts-table-header {
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+.hts-row {
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.hts-row:hover {
+    background-color: #e3f2fd;
+}
+
+.hts-row:last-child {
+    border-bottom: none;
+}

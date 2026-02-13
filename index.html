@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockNavi</title>
+    <meta name="description" content="주식 투자 초보를 위한 필수 사이트 모음 대시보드. 투자심리, 시세, 거시경제, 국내/미국 주식 정보를 HTS 스타일로 한눈에.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Toolbar (Global Menu) -->
+    <header
+        class="bg-[#212121] text-white p-1 flex justify-between items-center border-b border-gray-600 h-10 select-none">
+        <div class="flex items-center space-x-4">
+            <div class="font-bold text-lg text-yellow-400 px-2 flex items-center">
+                <i class="fas fa-chart-line mr-2"></i> STOCKNAVI
+            </div>
+            <div class="hidden md:flex space-x-1 text-xs">
+                <!-- Github Link -->
+                <span onclick="window.location.href='https://jtech-co.github.io/my-website/MLP.html'"
+                    class="bg-[#333] px-2 py-1 border border-[#555] cursor-pointer hover:bg-[#444] transition-colors">
+                    <i class="fab fa-github mr-1"></i>깃허브
+                </span>
+                <!-- Help Modal Trigger -->
+                <span onclick="openHelpModal()"
+                    class="bg-[#333] px-2 py-1 border border-[#555] cursor-pointer hover:bg-[#444] transition-colors">
+                    <i class="fas fa-question-circle mr-1"></i>도움말
+                </span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3 pr-2">
+            <!-- Search Bar -->
+            <div class="flex items-center bg-white text-black px-1 py-0.5 rounded-sm border border-gray-500">
+                <span class="text-blue-700 font-bold px-1 text-xs">통합검색</span>
+                <input type="text" id="searchInput" placeholder="사이트명/키워드 입력"
+                    class="outline-none text-xs w-40 px-1 placeholder-gray-400">
+                <i class="fas fa-search text-gray-500 cursor-pointer hover:text-black"></i>
+            </div>
+            <!-- Clock -->
+            <div id="clock" class="text-yellow-300 font-mono text-sm font-bold border border-gray-600 px-2 bg-black">
+                00:00:00
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- Sidebar (Tabs) -->
+        <aside
+            class="w-12 bg-[#3c3c3c] flex flex-col items-center py-2 space-y-2 border-r border-gray-600 text-gray-300 text-[10px]">
+            <div class="w-full text-center hover:text-white cursor-pointer group"
+                onclick="scrollToSection('sentiment')">
+                <div
+                    class="bg-[#555] w-8 h-8 mx-auto flex items-center justify-center rounded mb-1 group-hover:bg-[#d32f2f] transition">
+                    <i class="fas fa-heartbeat text-lg"></i>
+                </div>
+                심리
+            </div>
+            <div class="w-full text-center hover:text-white cursor-pointer group" onclick="scrollToSection('market')">
+                <div
+                    class="bg-[#555] w-8 h-8 mx-auto flex items-center justify-center rounded mb-1 group-hover:bg-[#d32f2f] transition">
+                    <i class="fas fa-chart-bar text-lg"></i>
+                </div>
+                시세
+            </div>
+            <div class="w-full text-center hover:text-white cursor-pointer group" onclick="scrollToSection('macro')">
+                <div
+                    class="bg-[#555] w-8 h-8 mx-auto flex items-center justify-center rounded mb-1 group-hover:bg-[#d32f2f] transition">
+                    <i class="fas fa-globe text-lg"></i>
+                </div>
+                거시
+            </div>
+            <div class="w-full text-center hover:text-white cursor-pointer group" onclick="scrollToSection('korea')">
+                <div
+                    class="bg-[#555] w-8 h-8 mx-auto flex items-center justify-center rounded mb-1 group-hover:bg-[#d32f2f] transition">
+                    <span class="font-bold text-sm">KR</span>
+                </div>
+                국장
+            </div>
+            <div class="w-full text-center hover:text-white cursor-pointer group" onclick="scrollToSection('us')">
+                <div
+                    class="bg-[#555] w-8 h-8 mx-auto flex items-center justify-center rounded mb-1 group-hover:bg-[#d32f2f] transition">
+                    <span class="font-bold text-sm">US</span>
+                </div>
+                미장
+            </div>
+        </aside>
+
+        <!-- Dashboard Content -->
+        <main class="flex-1 p-2 overflow-y-auto bg-[#d6d9df]" id="mainContainer">
+
+            <!-- Grid Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+
+                <!-- 1. Sentiment Panel -->
+                <div id="sentiment" class="hts-panel flex flex-col h-full search-item">
+                    <div class="hts-header">
+                        <span><span class="text-yellow-300 mr-1">[0100]</span> 투자심리 지표 (Sentiment)</span>
+                        <div class="flex space-x-1">
+                            <button class="btn-refresh"><i class="fas fa-sync-alt"></i></button>
+                            <button class="btn-refresh"><i class="fas fa-window-minimize"></i></button>
+                        </div>
+                    </div>
+                    <div class="overflow-auto flex-1 bg-white">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="hts-table-header text-xs">
+                                    <th class="p-1 w-1/3 border-r">지표명</th>
+                                    <th class="p-1">핵심 요약</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-xs">
+                                <tr class="hts-row"
+                                    onclick="window.open('https://edition.cnn.com/markets/fear-and-greed')">
+                                    <td class="p-2 border-r font-bold text-blue-800">CNN Fear & Greed</td>
+                                    <td class="p-2 text-gray-600">미국 주식 공포/탐욕 지수. 매매 타이밍 포착.</td>
+                                </tr>
+                                <tr class="hts-row"
+                                    onclick="window.open('https://alternative.me/crypto/fear-and-greed-index/')">
+                                    <td class="p-2 border-r font-bold text-blue-800">Crypto Fear & Greed</td>
+                                    <td class="p-2 text-gray-600">코인 시장 심리. 공포 극대 구간 확인용.</td>
+                                </tr>
+                                <tr class="hts-row"
+                                    onclick="window.open('https://www.tradingview.com/symbols/CBOE-VIX/')">
+                                    <td class="p-2 border-r font-bold text-blue-800">VIX (변동성 지수)</td>
+                                    <td class="p-2 text-gray-600">S&P500 공포 레벨. 시장 리스크 측정 필수.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 2. Market Flow Panel -->
+                <div id="market" class="hts-panel flex flex-col h-full search-item">
+                    <div class="hts-header">
+                        <span><span class="text-yellow-300 mr-1">[0200]</span> 시장 흐름/차트 (Market)</span>
+                        <div class="flex space-x-1">
+                            <button class="btn-refresh"><i class="fas fa-sync-alt"></i></button>
+                            <button class="btn-refresh"><i class="fas fa-window-minimize"></i></button>
+                        </div>
+                    </div>
+                    <div class="overflow-auto flex-1 bg-white">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="hts-table-header text-xs">
+                                    <th class="p-1 w-1/3 border-r">사이트명</th>
+                                    <th class="p-1">특징</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-xs">
+                                <tr class="hts-row" onclick="window.open('https://kr.investing.com')">
+                                    <td class="p-2 border-r font-bold text-green-700">Investing.com</td>
+                                    <td class="p-2 text-gray-600">글로벌 지수, 선물, 원자재 종합 시세.</td>
+                                </tr>
+                                <tr class="hts-row" onclick="window.open('https://kr.tradingview.com')">
+                                    <td class="p-2 border-r font-bold text-green-700">TradingView</td>
+                                    <td class="p-2 text-gray-600">강력한 차트 분석 툴. 전 자산 비교 용이.</td>
+                                </tr>
+                                <tr class="hts-row" onclick="window.open('https://finviz.com')">
+                                    <td class="p-2 border-r font-bold text-green-700">Finviz</td>
+                                    <td class="p-2 text-gray-600">S&P500 맵(히트맵) 시각화, 미국 주식 스크리너.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3. Macro Panel -->
+                <div id="macro" class="hts-panel flex flex-col h-full search-item">
+                    <div class="hts-header">
+                        <span><span class="text-yellow-300 mr-1">[0300]</span> 거시경제/금리 (Macro)</span>
+                        <div class="flex space-x-1">
+                            <button class="btn-refresh"><i class="fas fa-sync-alt"></i></button>
+                            <button class="btn-refresh"><i class="fas fa-window-minimize"></i></button>
+                        </div>
+                    </div>
+                    <div class="overflow-auto flex-1 bg-white">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="hts-table-header text-xs">
+                                    <th class="p-1 w-1/3 border-r">데이터 소스</th>
+                                    <th class="p-1">확인 데이터</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-xs">
+                                <tr class="hts-row" onclick="window.open('https://fred.stlouisfed.org')">
+                                    <td class="p-2 border-r font-bold text-gray-800">FRED (연준)</td>
+                                    <td class="p-2 text-gray-600">M2 유동성, 장단기 금리차, 실업률 원천 데이터.</td>
+                                </tr>
+                                <tr class="hts-row"
+                                    onclick="window.open('https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html')">
+                                    <td class="p-2 border-r font-bold text-gray-800">CME FedWatch</td>
+                                    <td class="p-2 text-gray-600">FOMC 금리 인상/인하 확률 실시간 예측.</td>
+                                </tr>
+                                <tr class="hts-row" onclick="window.open('https://tradingeconomics.com')">
+                                    <td class="p-2 border-r font-bold text-gray-800">Trading Economics</td>
+                                    <td class="p-2 text-gray-600">국가별 경제지표 캘린더 및 예측치 비교.</td>
+                                </tr>
+                                <tr class="hts-row" onclick="window.open('https://ecos.bok.or.kr')">
+                                    <td class="p-2 border-r font-bold text-gray-800">한국은행 ECOS</td>
+                                    <td class="p-2 text-gray-600">한국 기준금리, 통화량 등 국내 매크로 지표.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 4. Korea Stock Panel -->
+                <div id="korea" class="hts-panel flex flex-col h-full md:col-span-2 lg:col-span-2 search-item">
+                    <div class="hts-header">
+                        <span><span class="text-yellow-300 mr-1">[0400]</span> 국내 주식 심화 (Korea)</span>
+                        <div class="flex space-x-1">
+                            <button class="btn-refresh"><i class="fas fa-sync-alt"></i></button>
+                            <button class="btn-refresh"><i class="fas fa-window-minimize"></i></button>
+                        </div>
+                    </div>
+                    <div class="overflow-auto flex-1 bg-white">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="hts-table-header text-xs">
+                                    <th class="p-1 w-1/4 border-r">사이트</th>
+                                    <th class="p-1 w-1/4 border-r">분류</th>
+                                    <th class="p-1">활용 포인트</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-xs">
+                                <tr class="hts-row" onclick="window.open('https://finance.naver.com')">
+                                    <td class="p-2 border-r font-bold text-up">네이버 금융</td>
+                                    <td class="p-2 border-r text-center text-gray-500">포털/시세</td>
+                                    <td class="p-2 text-gray-600">가장 빠른 뉴스, 종목 토론방, 기본 재무제표.</td>
+                                </tr>
+                                <tr class="hts-row" onclick="window.open('https://dart.fss.or.kr')">
+                                    <td class="p-2 border-r font-bold text-up">DART 전자공시</td>
+                                    <td class="p-2 border-r text-center text-gray-500">공시 원문</td>
+                                    <td class="p-2 text-gray-600">사업보고서, 실적발표, 지분변동 공식 확인.</td>
+                                </tr>
+                                <tr class="hts-row" onclick="window.open('https://kind.krx.co.kr')">
+                                    <td class="p-2 border-r font-bold text-up">한국거래소(KRX)</td>
+                                    <td class="p-2 border-r text-center text-gray-500">수급/통계</td>
+                                    <td class="p-2 text-gray-600">기관/외인 수급 데이터, 공매도 현황, 시장 조치.</td>
+                                </tr>
+                                <tr class="hts-row" onclick="window.open('http://consensus.hankyung.com')">
+                                    <td class="p-2 border-r font-bold text-up">한경 컨센서스</td>
+                                    <td class="p-2 border-r text-center text-gray-500">리포트</td>
+                                    <td class="p-2 text-gray-600">증권사 애널리스트 종목/산업 분석 PDF 무료 열람.</td>
+                                </tr>
+                                <tr class="hts-row" onclick="window.open('https://seibro.or.kr')">
+                                    <td class="p-2 border-r font-bold text-up">SEIBRO (예탁원)</td>
+                                    <td class="p-2 border-r text-center text-gray-500">기타 통계</td>
+                                    <td class="p-2 text-gray-600">서학개미 순매수 상위 종목, 배당금 입금 내역.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 5. US & Portfolio Panel -->
+                <div id="us" class="hts-panel flex flex-col h-full search-item">
+                    <div class="hts-header">
+                        <span><span class="text-yellow-300 mr-1">[0500]</span> 미국/자산 (Global & Asset)</span>
+                        <div class="flex space-x-1">
+                            <button class="btn-refresh"><i class="fas fa-sync-alt"></i></button>
+                            <button class="btn-refresh"><i class="fas fa-window-minimize"></i></button>
+                        </div>
+                    </div>
+                    <div class="overflow-auto flex-1 bg-white">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="hts-table-header text-xs">
+                                    <th class="p-1 w-1/3 border-r">플랫폼</th>
+                                    <th class="p-1">기능</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-xs">
+                                <tr class="hts-row" onclick="window.open('https://www.etf.com')">
+                                    <td class="p-2 border-r font-bold text-purple-800">ETF.com / ETFdb</td>
+                                    <td class="p-2 text-gray-600">미국 ETF 비교 분석, 수수료 및 구성 종목 확인.</td>
+                                </tr>
+                                <tr class="hts-row" onclick="window.open('https://www.therich.io')">
+                                    <td class="p-2 border-r font-bold text-purple-800">The Rich (더리치)</td>
+                                    <td class="p-2 text-gray-600">포트폴리오 비주얼라이징, 월별 배당 달력.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Mini Ad / Tip Area -->
+                        <div class="p-2 bg-yellow-50 border-t border-gray-200 text-[11px] text-gray-600 mt-2">
+                            <span class="font-bold text-red-600">TIP</span> <br>
+                            북마크(Ctrl+D) 후, 아침 루틴으로 [0100] -> [0300] 순서로 보면 좋습니다.
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- End Grid -->
+
+            <!-- Bottom Ticker -->
+            <div
+                class="mt-2 bg-black text-white text-xs py-1 px-2 overflow-hidden whitespace-nowrap border border-gray-600 flex items-center">
+                <span class="text-yellow-400 font-bold mr-4">NOTICE</span>
+                <div class="inline-block animate-marquee">
+                    본 페이지는 투자 정보 제공을 목적으로 하며, 실제 투자의 책임은 본인에게 있습니다. 시장의 공포를 사고 탐욕을 경계하십시오. 성투하세요!
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Status Bar -->
+    <footer
+        class="bg-[#f0f0f0] border-t border-gray-400 p-1 text-[11px] text-gray-600 flex justify-between items-center select-none">
+        <div class="flex space-x-4">
+            <span class="flex items-center">
+                <div class="w-2 h-2 rounded-full bg-green-500 mr-1"></div> 서버연결: 정상
+            </span>
+            <span>화면번호: 1234 [즐겨찾기 종합]</span>
+        </div>
+        <div>
+            JTech Co
+        </div>
+    </footer>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-[#e2e2e2] border-2 border-[#777] shadow-xl w-11/12 max-w-lg md:w-[500px]">
+            <!-- Modal Header -->
+            <div
+                class="bg-gradient-to-b from-[#2c3e50] to-[#1a252f] text-white px-2 py-1 flex justify-between items-center select-none border-b border-[#555]">
+                <span class="font-bold text-xs flex items-center"><i class="fas fa-info-circle mr-1"></i> 도움말 -
+                    StockNavi 가이드</span>
+                <button onclick="closeHelpModal()" class="text-gray-300 hover:text-white px-1"><i
+                        class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-4 text-sm text-[#333] bg-white h-[400px] overflow-y-auto">
+                <h2 class="font-bold text-lg mb-2 text-blue-800 border-b pb-1">StockNavi란?</h2>
+                <p class="mb-4 text-gray-700 leading-relaxed">
+                    주식 투자에 필수적인 <strong>심리, 시세, 매크로(경제), 종목 분석</strong> 사이트들을
+                    <span class="text-blue-600 font-bold">HTS(Home Trading System)</span> 스타일로
+                    한곳에 모아둔 즐겨찾기 대시보드입니다.
+                </p>
+
+                <h2 class="font-bold text-lg mb-2 text-red-700 border-b pb-1">🔰 주린이 필수 가이드</h2>
+                <p class="mb-2 text-xs text-gray-500">초보자라면 아래 순서대로 확인하는 습관을 들이세요!</p>
+
+                <div class="space-y-3">
+                    <div class="bg-gray-50 p-2 border border-gray-200 rounded">
+                        <div class="font-bold text-blue-900 mb-1">STEP 1. 시장 분위기 파악 (심리)</div>
+                        <ul class="list-disc list-inside text-xs text-gray-600 ml-1">
+                            <li><strong>CNN Fear & Greed:</strong> 시장이 공포에 질렸는지, 탐욕스러운지 확인하세요. 'Extreme Fear'는 기회일 수
+                                있습니다.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-50 p-2 border border-gray-200 rounded">
+                        <div class="font-bold text-green-900 mb-1">STEP 2. 전체 흐름 확인 (시세/매크로)</div>
+                        <ul class="list-disc list-inside text-xs text-gray-600 ml-1">
+                            <li><strong>Investing.com:</strong> 미국/한국 지수가 올랐는지 내렸는지 확인하세요.</li>
+                            <li><strong>환율/유가:</strong> 달러와 기름값은 경제의 신호등입니다.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-50 p-2 border border-gray-200 rounded">
+                        <div class="font-bold text-red-900 mb-1">STEP 3. 내 종목 분석 (국장/미장)</div>
+                        <ul class="list-disc list-inside text-xs text-gray-600 ml-1">
+                            <li><strong>네이버 금융:</strong> 국내 뉴스와 종목 토론방 분위기 체크.</li>
+                            <li><strong>Finviz:</strong> 미국 주식 전체 맵을 보며 주도 섹터를 찾으세요.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-2 bg-yellow-50 text-xs text-gray-600 border border-yellow-200">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-1"></i>
+                    <strong>Tip:</strong> 이 페이지를 즐겨찾기 해두고 아침마다 순서대로 사이트를 방문해보세요. 투자 실력이 쑥쑥 늘어납니다!
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-2 flex justify-end bg-[#f0f0f0] border-t border-gray-300">
+                <button onclick="closeHelpModal()"
+                    class="bg-white border border-gray-400 px-4 py-1 text-xs hover:bg-gray-100 shadow-sm rounded-sm">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Modules -->
+    <script src="js/clock.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
