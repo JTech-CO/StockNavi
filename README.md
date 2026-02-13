@@ -2,6 +2,8 @@
 
 > **주식 투자 초보를 위한 필수 사이트 모음 대시보드 - HTS 스타일 즐겨찾기**
 
+<img width="3840" height="1820" alt="image" src="https://i.imgur.com/Zpt5Mg1.png" />
+
 ## 1. 소개 (Introduction)
 
 이 프로젝트는 주식 투자에 필요한 핵심 사이트들을 한곳에 모아 빠르게 접근할 수 있도록 만든 북마크 대시보드입니다.
@@ -26,7 +28,7 @@
 
 ## 3. 설치 및 실행 (Quick Start)
 
-별도의 빌드나 패키지 설치가 필요 없습니다.
+별도의 빌드나 패키지 설치가 필요 없습니다. [실행하기](<https://jtech-co.github.io/StockNavi/index.html>)
 
 1. **클론 (Clone)**
    ```bash
@@ -63,4 +65,5 @@ StockNavi/
 ## 5. 정보 (Info)
 
 - **License**: MIT
+
 - **Contact**: JTech Co
